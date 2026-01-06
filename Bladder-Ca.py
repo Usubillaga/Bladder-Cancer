@@ -19,6 +19,7 @@ st.markdown("""
     .schema-box { border: 1px solid #ddd; background-color: #ffffff; padding: 15px; border-radius: 5px; margin-top: 5px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .dose-header { font-weight: bold; color: #2c3e50; font-size: 1.1em; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px; }
     .sub-dose { font-weight: bold; color: #555; }
+    .small-text { font-size: 0.85em; color: #666; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -26,53 +27,72 @@ st.markdown("""
 TRANS = {
     "EN": {
         "title": "Bladder Cancer Clinical Decision Support",
-        "caption": "EAU 2025 & German S3 (V3.0) | NIAGARA, EV-302, Full Surgical Compass",
+        "caption": "EAU 2025 & German S3 (V3.0) | NIAGARA, EV-302, Full Protocols",
         "lang_select": "Select Language / Sprache / Idioma",
         "nav_title": "Navigation",
         "nav_modules": [
-            "Diagnosis (TNM & Staging)", 
-            "EORTC Calculator (Full)", 
+            "Diagnosis (TNM Details)", 
+            "EORTC Calculator (Detailed)", 
             "NMIBC: Risk, Re-TURB & Protocols", 
             "MIBC: Neoadjuvant (NIAGARA Only)", 
             "Metastatic (EV+Pembro)", 
-            "Surgical Compass (Diversions & PLND)"
+            "Surgical Compass (Diversions)"
         ],
         
         # TNM
-        "tnm_title": "🧮 TNM Staging & Clinical Routing",
-        "stage_result": "Calculated AJCC Stage Group:",
+        "tnm_title": "🧮 TNM Staging (UICC 8th Ed)",
+        "tnm_desc": "Detailed classification of Primary Tumor (T), Lymph Nodes (N), and Metastasis (M).",
+        "t_label": "T Category (Primary Tumor)",
+        "n_label": "N Category (Regional Nodes)",
+        "m_label": "M Category (Distant Metastasis)",
+        "stage_result": "Calculated Clinical Stage:",
         "clinical_rec": "Clinical Pathway Recommendation:",
-        "rec_nmibc": "👉 Proceed to **NMIBC Module** (TURBT + Adjuvant Instillations).",
-        "rec_mibc": "👉 Proceed to **MIBC Module** (Neoadjuvant + Radical Cystectomy).",
-        "rec_meta": "👉 Proceed to **Metastatic Module** (Systemic Therapy).",
+        "rec_nmibc": "👉 **Pathway:** NMIBC (TURBT + Adjuvant Instillations).",
+        "rec_mibc": "👉 **Pathway:** MIBC (Systemic Therapy + Radical Surgery).",
+        "rec_meta": "👉 **Pathway:** Metastatic (Palliative Systemic Therapy).",
+        "t_defs": {
+            "Ta": "Non-invasive papillary carcinoma",
+            "Tis": "Carcinoma in situ: 'flat tumor'",
+            "T1": "Tumor invades subepithelial connective tissue (lamina propria)",
+            "T2a": "Tumor invades superficial muscle (inner half)",
+            "T2b": "Tumor invades deep muscle (outer half)",
+            "T3a": "Microscopic invasion of perivesical tissue",
+            "T3b": "Macroscopic invasion of perivesical tissue (extravesical mass)",
+            "T4a": "Invades prostate, uterus, or vagina",
+            "T4b": "Invades pelvic wall or abdominal wall"
+        },
 
         # EORTC
         "eortc_title": "🔢 EORTC Risk Calculator (Sylvester et al. 2006)",
+        "eortc_desc": "Calculates the absolute risk of Recurrence and Progression at 1 and 5 years for Ta/T1 tumors.",
         "nb_tumors": "Number of Tumors",
         "tum_size": "Tumor Diameter",
         "prior_rec": "Prior Recurrence Rate",
         "t_cat": "T Category",
         "cis": "Concomitant CIS",
         "grade": "Grade (WHO 1973)",
-        "risk_rec": "Recurrence Risk",
-        "risk_prog": "Progression Risk",
+        "risk_rec": "Recurrence Risk Score",
+        "risk_prog": "Progression Risk Score",
+        "prob_table": "Probability Table",
         
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Complex Stratification & Treatment",
-        "nmibc_risk_header": "1. Risk Stratification (EAU 2024)",
+        "nmibc_risk_header": "1. Risk Stratification",
         "returb_header": "2. Re-TURB (Nach-TUR-B) Decision",
         "returb_req": "Re-TURB REQUIRED",
         "returb_reasons": "Indications: T1 Stage, Incomplete Resection, or No Muscle in High Risk specimen.",
         "returb_ok": "Re-TURB likely not needed",
         "proto_header": "3. Protocols & Contraindications",
-        "rg_vhigh": "VERY HIGH RISK",
-        "rg_high": "HIGH RISK", 
-        "rg_inter": "INTERMEDIATE RISK",
+        
+        # Risk Groups
         "rg_low": "LOW RISK",
-        "rec_vhigh": "Discuss Early Radical Cystectomy. BCG only if unfit/refused.",
-        "rec_high": "Adjuvant: BCG Full Dose (1-3 Years). Re-TURB Mandatory.",
-        "rec_inter": "Adjuvant: 1 Year Chemotherapy (MMC) OR BCG (Induction + 1y Maint).",
+        "rg_inter": "INTERMEDIATE RISK",
+        "rg_high": "HIGH RISK",
+        "rg_vhigh": "VERY HIGH RISK",
         "rec_low": "Single Instillation (SI) within 24h. No adjuvant treatment.",
+        "rec_inter": "Adjuvant: 1 Year Chemotherapy (MMC) OR BCG (Induction + 1y Maint).",
+        "rec_high": "Adjuvant: BCG Full Dose (1-3 Years). Re-TURB Mandatory.",
+        "rec_vhigh": "Discuss Early Radical Cystectomy. BCG only if unfit/refused.",
 
         "bcg_tab": "BCG Immunotherapy",
         "mmc_tab": "Mitomycin C",
@@ -173,8 +193,8 @@ TRANS = {
         "lang_select": "Sprache wählen",
         "nav_title": "Navigation",
         "nav_modules": [
-            "Diagnose (TNM & Staging)", 
-            "EORTC Rechner (Voll)", 
+            "Diagnose (TNM Details)", 
+            "EORTC Rechner (Detailliert)", 
             "NMIBC: Risiko & Therapie", 
             "MIBC: Neoadjuvant (NIAGARA)", 
             "Metastasiert (EV+Pembro)", 
@@ -182,23 +202,40 @@ TRANS = {
         ],
 
         # TNM
-        "tnm_title": "🧮 TNM Staging & Klinischer Pfad",
-        "stage_result": "Berechnetes Stadium (AJCC):",
-        "clinical_rec": "Empfohlener Klinischer Pfad:",
-        "rec_nmibc": "👉 Weiter zum **NMIBC Modul** (TUR-B + Instillationen).",
-        "rec_mibc": "👉 Weiter zum **MIBC Modul** (Neoadjuvant + Zystektomie).",
-        "rec_meta": "👉 Weiter zum **Metastasierten Modul** (Systemtherapie).",
+        "tnm_title": "🧮 TNM Staging (UICC 8. Aufl.)",
+        "tnm_desc": "Detaillierte Klassifikation von Primärtumor (T), Lymphknoten (N) und Metastasen (M).",
+        "t_label": "T Kategorie (Primärtumor)",
+        "n_label": "N Kategorie (Regionäre Lymphknoten)",
+        "m_label": "M Kategorie (Fernmetastasen)",
+        "stage_result": "Berechnetes Stadium:",
+        "clinical_rec": "Klinischer Pfad:",
+        "rec_nmibc": "👉 **Pfad:** NMIBC (TUR-B + Instillationen).",
+        "rec_mibc": "👉 **Pfad:** MIBC (Systemtherapie + Radikale Zystektomie).",
+        "rec_meta": "👉 **Pfad:** Metastasiert (Palliative Systemtherapie).",
+        "t_defs": {
+            "Ta": "Nicht-invasives papilläres Karzinom",
+            "Tis": "Carcinoma in situ: 'flacher Tumor'",
+            "T1": "Invasion des subepithelialen Bindegewebes (Lamina propria)",
+            "T2a": "Invasion der oberflächlichen Muskulatur (innere Hälfte)",
+            "T2b": "Invasion der tiefen Muskulatur (äußere Hälfte)",
+            "T3a": "Mikroskopische Invasion des perivesikalen Fettgewebes",
+            "T3b": "Makroskopische Invasion des perivesikalen Gewebes",
+            "T4a": "Invasion Prostata, Uterus oder Vagina",
+            "T4b": "Invasion Beckenwand oder Bauchwand"
+        },
         
         # EORTC
         "eortc_title": "🔢 EORTC Risikokalkulator (Sylvester et al. 2006)",
+        "eortc_desc": "Berechnet das absolute Risiko für Rezidiv und Progression nach 1 und 5 Jahren (Ta/T1).",
         "nb_tumors": "Anzahl der Tumoren",
         "tum_size": "Tumordurchmesser",
         "prior_rec": "Frühere Rezidivrate",
         "t_cat": "T-Kategorie",
         "cis": "Begleitendes CIS",
         "grade": "Grading (WHO 1973)",
-        "risk_rec": "Rezidivrisiko",
-        "risk_prog": "Progressionsrisiko",
+        "risk_rec": "Rezidivrisiko Score",
+        "risk_prog": "Progressionsrisiko Score",
+        "prob_table": "Wahrscheinlichkeits-Tabelle",
         
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Komplexe Stratifizierung & Therapie",
@@ -316,8 +353,8 @@ TRANS = {
         "lang_select": "Seleccionar Idioma",
         "nav_title": "Navegación",
         "nav_modules": [
-            "Diagnóstico (TNM)", 
-            "Calculadora EORTC (Completa)", 
+            "Diagnóstico (TNM Detalles)", 
+            "Calculadora EORTC (Detallada)", 
             "NMIBC: Riesgo & Tratamiento", 
             "MIBC: Neoadyuvancia (NIAGARA)", 
             "Metastásico (EV+Pembro)", 
@@ -325,23 +362,40 @@ TRANS = {
         ],
         
         # TNM
-        "tnm_title": "🧮 TNM Estadiaje y Ruta Clínica",
-        "stage_result": "Estadio AJCC Calculado:",
+        "tnm_title": "🧮 TNM Estadiaje (UICC 8ª Ed)",
+        "tnm_desc": "Clasificación detallada de Tumor Primario (T), Ganglios (N) y Metástasis (M).",
+        "t_label": "Categoría T (Tumor Primario)",
+        "n_label": "Categoría N (Ganglios Regionales)",
+        "m_label": "Categoría M (Metástasis a Distancia)",
+        "stage_result": "Estadio Clínico Calculado:",
         "clinical_rec": "Recomendación de Vía Clínica:",
-        "rec_nmibc": "👉 Proceder al **Módulo NMIBC** (RTU + Instilaciones).",
-        "rec_mibc": "👉 Proceder al **Módulo MIBC** (Neoadyuvancia + Cistectomía).",
-        "rec_meta": "👉 Proceder al **Módulo Metastásico** (Terapia Sistémica).",
+        "rec_nmibc": "👉 **Vía:** NMIBC (RTU + Instilaciones Adyuvantes).",
+        "rec_mibc": "👉 **Vía:** MIBC (Terapia Sistémica + Cirugía Radical).",
+        "rec_meta": "👉 **Vía:** Metastásico (Terapia Sistémica Paliativa).",
+        "t_defs": {
+            "Ta": "Carcinoma papilar no invasivo",
+            "Tis": "Carcinoma in situ: 'tumor plano'",
+            "T1": "Tumor invade tejido conectivo subepitelial (lámina propia)",
+            "T2a": "Tumor invade músculo superficial (mitad interna)",
+            "T2b": "Tumor invade músculo profundo (mitad externa)",
+            "T3a": "Invasión microscópica del tejido perivesical",
+            "T3b": "Invasión macroscópica del tejido perivesical",
+            "T4a": "Invade próstata, útero o vagina",
+            "T4b": "Invade pared pélvica o pared abdominal"
+        },
         
         # EORTC
         "eortc_title": "🔢 Calculadora EORTC (Sylvester et al. 2006)",
+        "eortc_desc": "Calcula el riesgo absoluto de Recurrencia y Progresión a 1 y 5 años (Ta/T1).",
         "nb_tumors": "Número de Tumores",
         "tum_size": "Diámetro del Tumor",
         "prior_rec": "Tasa de Recurrencia Previa",
         "t_cat": "Categoría T",
         "cis": "CIS Concomitante",
         "grade": "Grado (WHO 1973)",
-        "risk_rec": "Riesgo de Recurrencia",
-        "risk_prog": "Riesgo de Progresión",
+        "risk_rec": "Puntuación de Recurrencia",
+        "risk_prog": "Puntuación de Progresión",
+        "prob_table": "Tabla de Probabilidades",
 
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Estratificación y Protocolos",
@@ -458,53 +512,64 @@ def get_text(lang, key):
 
 def render_tnm_calculator(lang):
     st.markdown(f"## {get_text(lang, 'tnm_title')}")
-    st.info("AJCC 8th Edition / UICC")
+    st.caption(get_text(lang, 'tnm_desc'))
     
-    col1, col2, col3 = st.columns(3)
-    t = col1.selectbox("T", ["Ta", "Tis", "T1", "T2a", "T2b", "T3a", "T3b", "T4a", "T4b"])
-    n = col2.selectbox("N", ["N0", "N1", "N2", "N3"])
-    m = col3.selectbox("M", ["M0", "M1a", "M1b"])
     
-    # Logic
-    stage_group = "Unknown"
-    recommendation = ""
+    # 1. T Selection with Dictionary Definitions
+    st.markdown(f"#### {get_text(lang, 't_label')}")
+    t_defs = TRANS[lang]['t_defs']
+    # Create list of formatted strings for dropdown
+    t_options = list(t_defs.keys())
+    t_sel = st.selectbox("Select T", t_options, format_func=lambda x: f"{x} - {t_defs[x]}")
+
+    c2, c3 = st.columns(2)
+    with c2:
+        st.markdown(f"#### {get_text(lang, 'n_label')}")
+        n_sel = st.selectbox("Select N", ["N0", "N1", "N2", "N3"])
+    with c3:
+        st.markdown(f"#### {get_text(lang, 'm_label')}")
+        m_sel = st.selectbox("Select M", ["M0", "M1a", "M1b"])
+
+    # 2. Logic for Routing
+    stage_group = ""
+    rec_path = ""
     
-    if "M1" in m:
+    if "M1" in m_sel:
         stage_group = "Stage IV (Metastatic)"
-        recommendation = "rec_meta"
-    elif "T4b" in t:
+        rec_path = "rec_meta"
+    elif "T4b" in t_sel:
         stage_group = "Stage IVB"
-        recommendation = "rec_meta"
-    elif n != "N0":
+        rec_path = "rec_meta"
+    elif n_sel != "N0":
         stage_group = "Stage IIIA/IIIB (Locally Advanced)"
-        recommendation = "rec_mibc" # Usually treated as MIBC/Systemic
-    elif "T4a" in t:
+        rec_path = "rec_mibc"
+    elif "T4a" in t_sel:
         stage_group = "Stage IIIB"
-        recommendation = "rec_mibc"
-    elif "T3" in t:
+        rec_path = "rec_mibc"
+    elif "T3" in t_sel:
         stage_group = "Stage IIIA"
-        recommendation = "rec_mibc"
-    elif "T2" in t:
+        rec_path = "rec_mibc"
+    elif "T2" in t_sel:
         stage_group = "Stage II (Muscle Invasive)"
-        recommendation = "rec_mibc"
-    elif "T1" in t:
+        rec_path = "rec_mibc"
+    elif "T1" in t_sel:
         stage_group = "Stage I (High Risk NMIBC)"
-        recommendation = "rec_nmibc"
-    elif "Tis" in t:
+        rec_path = "rec_nmibc"
+    elif "Tis" in t_sel:
         stage_group = "Stage 0is (CIS)"
-        recommendation = "rec_nmibc"
+        rec_path = "rec_nmibc"
     else:
         stage_group = "Stage 0a (Ta)"
-        recommendation = "rec_nmibc"
-        
+        rec_path = "rec_nmibc"
+
     st.divider()
     st.markdown(f"### {get_text(lang, 'stage_result')} <span style='color:#d63031'>{stage_group}</span>", unsafe_allow_html=True)
     st.markdown(f"#### {get_text(lang, 'clinical_rec')}")
-    st.success(get_text(lang, recommendation))
+    st.info(get_text(lang, rec_path))
 
 def render_eortc_calculator_full(lang):
     st.markdown(f"## {get_text(lang, 'eortc_title')}")
-    st.caption("Calculates Recurrence & Progression Scores (Sylvester et al. 2006)")
+    st.caption(get_text(lang, 'eortc_desc'))
     
     # Inputs
     c1, c2 = st.columns(2)
@@ -529,12 +594,32 @@ def render_eortc_calculator_full(lang):
     if grade == "G2": rec_score += 1
     elif grade == "G3": rec_score += 2; prog_score += 5
 
+    # Tables (Sylvester 2006)
+    def get_rec_prob(s):
+        if s == 0: return "15%", "31%"
+        if 1 <= s <= 4: return "24%", "46%"
+        if 5 <= s <= 9: return "38%", "62%"
+        return "61%", "78%" # >= 10
+    
+    def get_prog_prob(s):
+        if s == 0: return "0.2%", "0.8%"
+        if 2 <= s <= 6: return "1%", "6%"
+        if 7 <= s <= 13: return "5%", "17%"
+        return "17%", "45%" # >= 14
+
+    r1, r5 = get_rec_prob(rec_score)
+    p1, p5 = get_prog_prob(prog_score)
+
     st.divider()
+    
     k1, k2 = st.columns(2)
     with k1:
-        st.metric(get_text(lang, 'risk_rec'), f"{rec_score} Points")
+        st.markdown(f"#### {get_text(lang, 'risk_rec')}: <span style='color:#0984e3'>{rec_score}</span>", unsafe_allow_html=True)
+        st.table({"Year": ["1 Year", "5 Years"], "Probability": [r1, r5]})
+        
     with k2:
-        st.metric(get_text(lang, 'risk_prog'), f"{prog_score} Points")
+        st.markdown(f"#### {get_text(lang, 'risk_prog')}: <span style='color:#d63031'>{prog_score}</span>", unsafe_allow_html=True)
+        st.table({"Year": ["1 Year", "5 Years"], "Probability": [p1, p5]})
 
 def render_nmibc_full_restore(lang):
     st.markdown(f"## {get_text(lang, 'nmibc_title')}")
