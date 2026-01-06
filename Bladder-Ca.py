@@ -435,10 +435,6 @@ def render_nmibc_full_restore(lang):
     st.markdown(f"## {get_text(lang, 'nmibc_title')}")
     st.caption("EAU 2024/25 Risk Stratification")
     
-
-[Image of bladder cancer staging diagram]
-
-    
     # 1. RISK STRATIFICATION
     st.markdown(f"### {get_text(lang, 'nmibc_risk_header')}")
     c1, c2 = st.columns(2)
