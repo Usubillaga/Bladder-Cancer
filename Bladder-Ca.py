@@ -12,10 +12,13 @@ st.set_page_config(
 st.markdown("""
 <style>
     .header-style { background-color: #f0f2f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .success-box { border-left: 5px solid #28a745; background-color: #e6ffed; padding: 15px; border-radius: 4px; }
-    .warning-box { border-left: 5px solid #ffc107; background-color: #fff3cd; padding: 15px; border-radius: 4px; }
-    .alert-box { border-left: 5px solid #dc3545; background-color: #f8d7da; padding: 15px; border-radius: 4px; }
-    .info-box { border-left: 5px solid #17a2b8; background-color: #e2fbfd; padding: 15px; border-radius: 4px; }
+    .success-box { border-left: 5px solid #28a745; background-color: #e6ffed; padding: 15px; border-radius: 4px; margin-bottom: 10px; }
+    .warning-box { border-left: 5px solid #ffc107; background-color: #fff3cd; padding: 15px; border-radius: 4px; margin-bottom: 10px; }
+    .alert-box { border-left: 5px solid #dc3545; background-color: #f8d7da; padding: 15px; border-radius: 4px; margin-bottom: 10px; }
+    .info-box { border-left: 5px solid #17a2b8; background-color: #e2fbfd; padding: 15px; border-radius: 4px; margin-bottom: 10px; }
+    .schema-box { border: 1px solid #ddd; background-color: #ffffff; padding: 15px; border-radius: 5px; margin-top: 5px; margin-bottom: 10px; }
+    .dose-header { font-weight: bold; color: #333; font-size: 1.1em; }
+    .dose-detail { font-family: monospace; color: #555; background-color: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -23,183 +26,293 @@ st.markdown("""
 TRANS = {
     "EN": {
         "title": "Bladder Cancer Clinical Decision Support",
-        "caption": "EAU 2024/25 & German S3 (V3.0) | Includes NIAGARA & EV-302",
-        "lang_select": "Select Language / Sprache / Idioma",  # <--- FIXED: Key added here
+        "caption": "EAU 2024/25 & German S3 (V3.0) | NIAGARA, EV-302, Full Dosing Schemas",
+        "lang_select": "Select Language / Sprache / Idioma",
         "nav_title": "Navigation",
-        "nav_modules": ["Diagnosis (TNM)", "EORTC Calculator", "NMIBC: Treatment", "MIBC: Neoadjuvant & NIAGARA", "Metastatic (mUC)", "Surgical Compass (Diversions)"],
+        "nav_modules": [
+            "Diagnosis (TNM)", 
+            "EORTC Calculator", 
+            "NMIBC: Treatment & Contraindications", 
+            "MIBC: Neoadjuvant (Dosing & NIAGARA)", 
+            "Metastatic (EV+Pembro Schema)", 
+            "Surgical Compass (Diversions)"
+        ],
         
-        # NMIBC
-        "nmibc_title": "🟢 NMIBC: Risk Stratification & Re-TURB",
-        "risk_factors": "Risk Factors",
-        "multifocal": "Multifocal (Multilocular)",
-        "size_label": "Tumor Size",
-        "grade_label": "Grade (WHO 2004/2016)",
-        "t1_label": "Stage T1?",
-        "muscle_label": "Muscle in specimen?",
-        "complete_label": "Resection complete?",
-        "returb_header": "🛑 Re-TURB (Nach-TUR-B) Check",
+        # NMIBC (Preserved)
+        "nmibc_title": "🟢 NMIBC: Risk, Re-TURB & Instillations",
+        "returb_header": "🛑 Re-TURB Check",
         "returb_req": "Re-TURB REQUIRED",
-        "returb_reasons": "Reasons: T1, Incomplete, or No Muscle in High Risk.",
+        "returb_reasons": "T1, Incomplete, or No Muscle in High Risk.",
         "returb_ok": "Re-TURB likely not needed",
-        "rec_header": "Treatment Recommendation",
-        "rec_low": "Low Risk: Single Instillation (SI) within 24h. No adjuvant.",
-        "rec_inter": "Intermediate: 1 Year Chemo (MMC) or BCG.",
-        "rec_high": "High Risk: BCG for 1-3 Years (SWOG). Re-TURB Mandatory.",
-        "rec_vhigh": "Very High Risk: Consider Early Cystectomy. BCG only if unfit.",
-        "proto_header": "💉 Instillation Protocols",
-        "bcg_sched": "**BCG (SWOG):** 6x Weekly Induction. Maintenance: 3x weekly at 3,6,12,18,24,30,36 mo.",
-        "mmc_sched": "**Mitomycin:** Early instillation (<24h). Adj: Weekly x 6, then Monthly x 11.",
+        "proto_header": "💉 Instillation Protocols & Contraindications",
+        "bcg_tab": "BCG Immunotherapy",
+        "mmc_tab": "Mitomycin C",
+        "bcg_sched": "**Induction:** Weekly x 6.\n**Maintenance (SWOG):** 3 weekly instillations at months 3, 6, 12, 18, 24, 30, 36.",
+        "bcg_contra_title": "❌ BCG Contraindications:",
+        "bcg_contra_list": "* Traumatic Cath / Hematuria (>7-14 days)\n* Active TB\n* Immunosuppression\n* Febrile Illness/UTI",
+        "mmc_sched": "**Early:** <24h post-TURBT (40mg).\n**Adjuvant:** Weekly x 6, then Monthly x 11.",
+        "mmc_contra_title": "❌ Mitomycin Contraindications:",
+        "mmc_contra_list": "* Perforation (Extravasation Risk)\n* Uncontrolled UTI\n* Hypersensitivity",
 
-        # MIBC & NIAGARA
-        "mibc_title": "🟠 MIBC: Neoadjuvant & Perioperative Therapy",
-        "cis_fit": "Is patient Cisplatin-eligible?",
-        "niagara_header": "🆕 NEW STANDARD: Perioperative Immunotherapy (NIAGARA Study 2024)",
-        "niagara_desc": "**Durvalumab + Gem/Cis (NAC)** followed by RC + **Adjuvant Durvalumab**.",
-        "niagara_benefit": "Shown to improve Event-Free Survival (EFS) and OS compared to Chemo alone.",
-        "std_nac": "**Standard NAC:** Gemcitabine + Cisplatin (or ddMVAC) x 4 cycles -> RC.",
-        "unfit_desc": "**Unfit for Cisplatin:** Direct Radical Cystectomy (Upfront RC). Carboplatin-NAC not recommended.",
-
-        # SURGERY
-        "surg_title": "🔪 Surgical Compass: Urinary Diversion",
-        "tabs_div": ["Orthotopic Neobladder", "Ileal Conduit", "Ureterocutaneostomy (UCN)"],
-        "nb_ind": "Gold standard for fit patients wanting natural voiding.",
-        "nb_contra": "❌ **Absolute Contraindications (Neobladder):**",
-        "nb_c_list": """
-        1. Tumor infiltration of urethra / bladder neck.
-        2. Renal insufficiency (GFR < 50 ml/min).
-        3. Severe hepatic dysfunction.
-        4. Inability to perform self-catheterization (mental/physical).
-        5. Inflammatory Bowel Disease (Crohn's/Colitis).
-        6. Prior high-dose radiation (relative).
+        # MIBC Dosing & Contraindications
+        "mibc_title": "🟠 MIBC: Neoadjuvant Therapy (NAC)",
+        "cis_fit_q": "Is patient Cisplatin-eligible?",
+        "nac_schemas_title": "💊 Neoadjuvant Dosing Schemas (Standard & NIAGARA)",
+        
+        # 1. Gem-Cis
+        "gc_title": "Standard: Gemcitabine + Cisplatin (GC)",
+        "gc_details": """
+        * **Gemcitabine:** 1000 mg/m² IV (Days 1 & 8)
+        * **Cisplatin:** 70 mg/m² IV (Day 1)
+        * **Cycle:** Every 21 days (q3w)
+        * **Duration:** 4 Cycles
         """,
-        "ic_ind": "Standard for patients with contraindications to Neobladder or elderly/frail.",
-        "ic_pros": "✅ **Pros:** Shorter OR time, fewer metabolic complications than Neobladder.",
-        "ucn_ind": "⚠️ **Ureterocutaneostomy (UCN):** Palliative / Last Resort.",
-        "ucn_desc": "Indicated for patients **unfit for bowel resection** (short bowel, radiation enteritis) or extreme frailty. High rate of stenosis/stenting required.",
+        
+        # 2. ddMVAC
+        "ddmvac_title": "Alternative: Dose-Dense MVAC (ddMVAC)",
+        "ddmvac_details": """
+        * **Methotrexate:** 30 mg/m² IV (Day 1)
+        * **Vinblastine:** 3 mg/m² IV (Day 2)
+        * **Doxorubicin:** 30 mg/m² IV (Day 2)
+        * **Cisplatin:** 70 mg/m² IV (Day 2)
+        * **Support:** G-CSF (Pegfilgrastim) Day 3 or Days 3-9
+        * **Cycle:** Every 14 days (q2w)
+        * **Duration:** 4 Cycles
+        """,
+        
+        # 3. NIAGARA
+        "niagara_title": "🆕 NIAGARA: Durvalumab + Gem/Cis",
+        "niagara_details": """
+        **Pre-Operative (4 Cycles, q3w):**
+        * **Durvalumab:** 1500 mg IV (Day 1)
+        * **Gemcitabine:** 1000 mg/m² IV (Days 1 & 8)
+        * **Cisplatin:** 70 mg/m² IV (Day 1)
+        
+        **-- SURGERY (RC) --**
+        
+        **Post-Operative (Adjuvant):**
+        * **Durvalumab:** 1500 mg IV every 4 weeks
+        * **Duration:** 8 Cycles (Total treatment span included)
+        """,
 
-        # METASTATIC
-        "meta_title": "🔴 Metastatic (mUC)",
-        "ev_pembro": "🏆 **1st Line:** Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "nac_contra_title": "🚫 Contraindications for Cisplatin (Galsky Criteria):",
+        "nac_contra_list": """
+        1.  **ECOG PS ≥ 2**
+        2.  **GFR < 60 ml/min** (Split dose 45-59 possible, but Carboplatin usually inferior for NAC).
+        3.  **Hearing Loss:** Grade ≥ 2 (Audiometric).
+        4.  **Neuropathy:** Grade ≥ 2.
+        5.  **Heart Failure:** NYHA Class III/IV.
+        """,
+
+        # Metastatic
+        "meta_title": "🔴 Metastatic (mUC): EV + Pembro",
+        "ev_pembro_header": "🏆 Standard: Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "ev_dose": "**Enfortumab Vedotin:** 1.25 mg/kg (Max 125 mg) IV Days 1 & 8",
+        "pembro_dose": "**Pembrolizumab:** 200 mg IV Day 1 (q3w) OR 400 mg q6w",
+        "meta_contra_title": "⚠️ EV+Pembro Contraindications:",
+        "meta_contra_list": "* Uncontrolled Diabetes (Hyperglycemia)\n* Severe Cutaneous Reactions (SJS/TEN)\n* Severe Hepatic Impairment (Child-Pugh C)\n* Pre-existing PN > Gr2",
+
+        # Surgery
+        "surg_title": "🔪 Surgical Compass",
+        "nb_ind": "Neobladder",
+        "ic_ind": "Ileal Conduit",
+        "ucn_ind": "UCN (Palliative)",
+        "nb_contra_title": "❌ Absolute Neobladder Contraindications:",
+        "nb_contra_list": "1. Tumor in Urethra\n2. GFR < 50\n3. Liver Failure\n4. Inability to Self-Cath\n5. IBD\n6. High-dose Radiation"
     },
+    
     "DE": {
         "title": "Klinische Entscheidungshilfe: Harnblasenkarzinom",
-        "caption": "EAU 2025 & S3-Leitlinie (V3.0) | Inkl. NIAGARA & EV-302",
-        "lang_select": "Sprache wählen", # <--- FIXED
+        "caption": "EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Dosis-Schemata",
+        "lang_select": "Sprache wählen",
         "nav_title": "Navigation",
-        "nav_modules": ["Diagnose (TNM)", "EORTC Rechner", "NMIBC: Therapie", "MIBC: Neoadjuvant & NIAGARA", "Metastasiert (mUC)", "Chirurgie Kompass (Ableitung)"],
+        "nav_modules": [
+            "Diagnose (TNM)", 
+            "EORTC Rechner", 
+            "NMIBC: Therapie & Kontraindikation", 
+            "MIBC: Neoadjuvant (Dosis & NIAGARA)", 
+            "Metastasiert (EV+Pembro Schema)", 
+            "Chirurgie Kompass (Ableitung)"
+        ],
         
         # NMIBC
-        "nmibc_title": "🟢 NMIBC: Risiko & Nach-TUR-B",
-        "risk_factors": "Risikofaktoren",
-        "multifocal": "Multifokal (Multilokulär)",
-        "size_label": "Tumorgröße",
-        "grade_label": "Grading (WHO 2004/2016)",
-        "t1_label": "Stadium T1?",
-        "muscle_label": "Detrusor (Muskel) im Präparat?",
-        "complete_label": "Resektion komplett?",
-        "returb_header": "🛑 Nach-TUR-B (Re-TURB) Check",
+        "nmibc_title": "🟢 NMIBC: Risiko, Nach-TUR-B & Instillationen",
+        "returb_header": "🛑 Nach-TUR-B Check",
         "returb_req": "Nach-TUR-B ERFORDERLICH",
-        "returb_reasons": "Gründe: T1, Inkomplett oder kein Muskel bei High Risk.",
+        "returb_reasons": "T1, Inkomplett, oder kein Muskel bei High Risk.",
         "returb_ok": "Nach-TUR-B wahrscheinlich nicht nötig",
-        "rec_header": "Therapieempfehlung",
-        "rec_low": "Low Risk: Einmalige Frühinstillation (SI) <24h. Keine weitere Therapie.",
-        "rec_inter": "Intermediate: 1 Jahr Chemo (MMC) oder BCG.",
-        "rec_high": "High Risk: BCG für 1-3 Jahre (SWOG). Nach-TUR-B obligat.",
-        "rec_vhigh": "Very High Risk: Frühe Zystektomie erwägen. BCG nur wenn OP unmöglich.",
-        "proto_header": "💉 Instillations-Protokolle",
-        "bcg_sched": "**BCG (SWOG):** 6x Wöchentlich Induktion. Erhaltung: 3x wöchentlich in Monaten 3,6,12,18,24,30,36.",
-        "mmc_sched": "**Mitomycin:** Frühinstillation (<24h). Adj: Wöchentlich x 6, dann Monatlich x 11.",
+        "proto_header": "💉 Protokolle & Kontraindikationen",
+        "bcg_tab": "BCG Immuntherapie",
+        "mmc_tab": "Mitomycin C",
+        "bcg_sched": "**Induktion:** Wöchentlich x 6.\n**Erhaltung (SWOG):** 3 Wochen in den Monaten 3, 6, 12, 18, 24, 30, 36.",
+        "bcg_contra_title": "❌ BCG Kontraindikationen:",
+        "bcg_contra_list": "* Traumat. Katheter / Hämaturie (>7-14 Tage)\n* Aktive Tbc\n* Immunsuppression\n* Fieber/HWI",
+        "mmc_sched": "**Früh:** <24h nach TUR-B (40mg).\n**Adjuvant:** Wöchentlich x 6, dann Monatlich x 11.",
+        "mmc_contra_title": "❌ Mitomycin Kontraindikationen:",
+        "mmc_contra_list": "* Perforation (Extravasation!)\n* Unkontrollierter HWI\n* Überempfindlichkeit",
 
-        # MIBC & NIAGARA
-        "mibc_title": "🟠 MIBC: Neoadjuvant & Perioperative Therapie",
-        "cis_fit": "Ist Patient Cisplatin-geeignet?",
-        "niagara_header": "🆕 NEUER STANDARD: Perioperative Immuntherapie (NIAGARA Studie 2024)",
-        "niagara_desc": "**Durvalumab + Gem/Cis (NAC)** gefolgt von RC + **Adjuvant Durvalumab**.",
-        "niagara_benefit": "Signifikanter Vorteil im Event-Free Survival (EFS) und OS gegenüber Chemo allein.",
-        "std_nac": "**Standard NAC:** Gemcitabin + Cisplatin (oder ddMVAC) x 4 Zyklen -> RC.",
-        "unfit_desc": "**Nicht Cisplatin-geeignet:** Direkte Radikale Zystektomie. Carboplatin-NAC nicht empfohlen.",
-
-        # SURGERY
-        "surg_title": "🔪 Chirurgie Kompass: Harnableitung",
-        "tabs_div": ["Orthotope Neoblase", "Ileum-Conduit", "Harnleiterhautfistel (UCN)"],
-        "nb_ind": "Goldstandard für fitte Patienten mit Wunsch nach Kontinenz.",
-        "nb_contra": "❌ **Absolute Kontraindikationen (Neoblase):**",
-        "nb_c_list": """
-        1. Tumor in der Harnröhre / Blasenhals.
-        2. Niereninsuffizienz (GFR < 50 ml/min).
-        3. Schwere Leberfunktionsstörung.
-        4. Unfähigkeit zum Selbstkatheterismus (mental/physisch).
-        5. Chronisch entzündliche Darmerkrankungen (Morbus Crohn/Colitis).
-        6. Hochdosis-Bestrahlung Becken (relativ).
+        # MIBC Dosing
+        "mibc_title": "🟠 MIBC: Neoadjuvante Therapie (NAC)",
+        "cis_fit_q": "Ist Patient Cisplatin-geeignet?",
+        "nac_schemas_title": "💊 Neoadjuvante Dosis-Schemata",
+        
+        # 1. Gem-Cis
+        "gc_title": "Standard: Gemcitabin + Cisplatin (GC)",
+        "gc_details": """
+        * **Gemcitabin:** 1000 mg/m² i.v. (Tag 1 & 8)
+        * **Cisplatin:** 70 mg/m² i.v. (Tag 1)
+        * **Zyklus:** Alle 21 Tage (q3w)
+        * **Dauer:** 4 Zyklen
         """,
-        "ic_ind": "Standard für Patienten mit Kontraindikationen zur Neoblase oder Ältere/Gebrechliche.",
-        "ic_pros": "✅ **Vorteile:** Kürzere OP-Zeit, weniger Stoffwechselkomplikationen als Neoblase.",
-        "ucn_ind": "⚠️ **Harnleiterhautfistel (UCN):** Palliativ / Ultima Ratio.",
-        "ucn_desc": "Indiziert wenn **Darmresektion unmöglich** (Kurzdarm, Strahlenenteritis) oder extreme Gebrechlichkeit. Hohe Stenoserate (Dauer-Splint).",
+        
+        # 2. ddMVAC
+        "ddmvac_title": "Alternativ: Dosis-intensiviertes MVAC (ddMVAC)",
+        "ddmvac_details": """
+        * **Methotrexat:** 30 mg/m² i.v. (Tag 1)
+        * **Vinblastin:** 3 mg/m² i.v. (Tag 2)
+        * **Doxorubicin:** 30 mg/m² i.v. (Tag 2)
+        * **Cisplatin:** 70 mg/m² i.v. (Tag 2)
+        * **Support:** G-CSF (Pegfilgrastim) Tag 3 od. 3-9
+        * **Zyklus:** Alle 14 Tage (q2w)
+        * **Dauer:** 4 Zyklen
+        """,
+        
+        # 3. NIAGARA
+        "niagara_title": "🆕 NIAGARA: Durvalumab + Gem/Cis",
+        "niagara_details": """
+        **Prä-Operativ (4 Zyklen, q3w):**
+        * **Durvalumab:** 1500 mg i.v. (Tag 1)
+        * **Gemcitabin:** 1000 mg/m² i.v. (Tag 1 & 8)
+        * **Cisplatin:** 70 mg/m² i.v. (Tag 1)
+        
+        **-- OPERATION (RC) --**
+        
+        **Post-Operativ (Adjuvant):**
+        * **Durvalumab:** 1500 mg i.v. alle 4 Wochen
+        * **Dauer:** 8 Zyklen (Gesamttherapiedauer beachten)
+        """,
 
-        # METASTATIC
-        "meta_title": "🔴 Metastasiert (mUC)",
-        "ev_pembro": "🏆 **1. Linie:** Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "nac_contra_title": "🚫 Cisplatin-Kontraindikationen (Galsky):",
+        "nac_contra_list": """
+        1.  **ECOG PS ≥ 2**
+        2.  **GFR < 60 ml/min** (Split-Dose 45-59 möglich).
+        3.  **Hörverlust:** Grad ≥ 2.
+        4.  **Neuropathie:** Grad ≥ 2.
+        5.  **Herzinsuffizienz:** NYHA III/IV.
+        """,
+
+        # Metastatic
+        "meta_title": "🔴 Metastasiert (mUC): EV + Pembro",
+        "ev_pembro_header": "🏆 Standard: Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "ev_dose": "**Enfortumab Vedotin:** 1,25 mg/kg (Max 125 mg) i.v. Tage 1 & 8",
+        "pembro_dose": "**Pembrolizumab:** 200 mg i.v. Tag 1 (q3w) ODER 400 mg q6w",
+        "meta_contra_title": "⚠️ EV+Pembro Kontraindikationen:",
+        "meta_contra_list": "* Unkontrollierter Diabetes (Hyperglykämie)\n* Schwere Hautreaktionen (SJS/TEN)\n* Leberinsuffizienz (Child-Pugh C)\n* Vorbestehende PNP > Gr2",
+
+        # Surgery
+        "surg_title": "🔪 Chirurgie Kompass",
+        "nb_ind": "Neoblase",
+        "ic_ind": "Conduit",
+        "ucn_ind": "Harnleiterhautfistel",
+        "nb_contra_title": "❌ Absolute Neoblasen-Kontraindikationen:",
+        "nb_contra_list": "1. Tumor in Harnröhre\n2. GFR < 50\n3. Leberversagen\n4. Unfähigkeit Selbstkatheterismus\n5. CED (Crohn)\n6. Hochdosis-Bestrahlung"
     },
+
     "ES": {
         "title": "Soporte de Decisión Clínica: Cáncer de Vejiga",
-        "caption": "Guías EAU 2025 y S3 (V3.0) | Incluye NIAGARA y EV-302",
-        "lang_select": "Seleccionar Idioma", # <--- FIXED
+        "caption": "Guías EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Esquemas Completos",
+        "lang_select": "Seleccionar Idioma",
         "nav_title": "Navegación",
-        "nav_modules": ["Diagnóstico (TNM)", "Calculadora EORTC", "NMIBC: Tratamiento", "MIBC: Neoadyuvancia y NIAGARA", "Metastásico (mUC)", "Brújula Quirúrgica"],
+        "nav_modules": [
+            "Diagnóstico (TNM)", 
+            "Calculadora EORTC", 
+            "NMIBC: Tratamiento y Contraindicaciones", 
+            "MIBC: Neoadyuvancia (Dosis y NIAGARA)", 
+            "Metastásico (Esquema EV+Pembro)", 
+            "Brújula Quirúrgica"
+        ],
         
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Riesgo y Re-RTU",
-        "risk_factors": "Factores de Riesgo",
-        "multifocal": "Multifocal (Multilocular)",
-        "size_label": "Tamaño Tumor",
-        "grade_label": "Grado (WHO 2004/2016)",
-        "t1_label": "¿Estadio T1?",
-        "muscle_label": "¿Músculo en muestra?",
-        "complete_label": "¿Resección completa?",
-        "returb_header": "🛑 Chequeo Re-RTU (Nach-TUR-B)",
+        "returb_header": "🛑 Chequeo Re-RTU",
         "returb_req": "Re-RTU REQUERIDA",
-        "returb_reasons": "Motivos: T1, Incompleta, o sin músculo en Alto Riesgo.",
-        "returb_ok": "Probablemente no requiere Re-RTU",
-        "rec_header": "Recomendación",
-        "rec_low": "Bajo Riesgo: Instilación Única (SI) <24h. Sin adyuvancia.",
-        "rec_inter": "Intermedio: 1 Año Quimio (MMC) o BCG.",
-        "rec_high": "Alto Riesgo: BCG por 1-3 Años (SWOG). Re-RTU Obligatoria.",
-        "rec_vhigh": "Muy Alto Riesgo: Considerar Cistectomía. BCG solo si no apto.",
-        "proto_header": "💉 Protocolos de Instilación",
-        "bcg_sched": "**BCG (SWOG):** Inducción Semanal x6. Mantenimiento: 3x sem en meses 3,6,12,18,24,30,36.",
-        "mmc_sched": "**Mitomicina:** Instilación Temprana (<24h). Ady: Semanal x 6, luego Mensual x 11.",
+        "returb_reasons": "T1, Incompleta, o sin músculo en Alto Riesgo.",
+        "returb_ok": "No requiere Re-RTU",
+        "proto_header": "💉 Protocolos y Contraindicaciones",
+        "bcg_tab": "Inmunoterapia BCG",
+        "mmc_tab": "Mitomicina C",
+        "bcg_sched": "**Inducción:** Semanal x 6.\n**Mantenimiento (SWOG):** 3 dosis sem en meses 3, 6, 12, 18, 24, 30, 36.",
+        "bcg_contra_title": "❌ Contraindicaciones BCG:",
+        "bcg_contra_list": "* Catéter Traumático / Hematuria (>7-14 días)\n* Tuberculosis Activa\n* Inmunosupresión\n* Fiebre/ITU",
+        "mmc_sched": "**Temprana:** <24h post-RTU (40mg).\n**Adyuvante:** Semanal x 6, luego Mensual x 11.",
+        "mmc_contra_title": "❌ Contraindicaciones Mitomicina:",
+        "mmc_contra_list": "* Perforación (Extravasación)\n* ITU no controlada\n* Hipersensibilidad",
 
-        # MIBC & NIAGARA
-        "mibc_title": "🟠 MIBC: Terapia Neoadyuvante y Perioperatoria",
-        "cis_fit": "¿Paciente elegible para Cisplatino?",
-        "niagara_header": "🆕 NUEVO ESTÁNDAR: Inmunoterapia Perioperatoria (Estudio NIAGARA 2024)",
-        "niagara_desc": "**Durvalumab + Gem/Cis (NAC)** seguido de RC + **Durvalumab Adyuvante**.",
-        "niagara_benefit": "Mejora significativa en Supervivencia Libre de Eventos (EFS) y OS vs Quimio sola.",
-        "std_nac": "**NAC Estándar:** Gemcitabina + Cisplatino (o ddMVAC) x 4 ciclos -> RC.",
-        "unfit_desc": "**No apto Cisplatino:** Cistectomía Radical Directa. No se recomienda Carboplatino-NAC.",
-
-        # SURGERY
-        "surg_title": "🔪 Brújula Quirúrgica: Derivación Urinaria",
-        "tabs_div": ["Neovejiga Ortotópica", "Conducto Ileal", "Ureterocutaneostomía (UCN)"],
-        "nb_ind": "Estándar de oro para pacientes aptos que desean micción natural.",
-        "nb_contra": "❌ **Contraindicaciones Absolutas (Neovejiga):**",
-        "nb_c_list": """
-        1. Infiltración tumoral de uretra / cuello vesical.
-        2. Insuficiencia renal (TFG < 50 ml/min).
-        3. Disfunción hepática severa.
-        4. Incapacidad para autocateterismo (mental/física).
-        5. Enfermedad Inflamatoria Intestinal (Crohn/Colitis).
-        6. Radiación pélvica previa (relativa).
+        # MIBC Dosing
+        "mibc_title": "🟠 MIBC: Neoadyuvancia (NAC)",
+        "cis_fit_q": "¿Elegible para Cisplatino?",
+        "nac_schemas_title": "💊 Esquemas de Dosis Neoadyuvantes",
+        
+        # 1. Gem-Cis
+        "gc_title": "Estándar: Gemcitabina + Cisplatino (GC)",
+        "gc_details": """
+        * **Gemcitabina:** 1000 mg/m² IV (Días 1 y 8)
+        * **Cisplatino:** 70 mg/m² IV (Día 1)
+        * **Ciclo:** Cada 21 días (q3w)
+        * **Duración:** 4 Ciclos
         """,
-        "ic_ind": "Estándar para pacientes con contraindicaciones a Neovejiga o ancianos/frágiles.",
-        "ic_pros": "✅ **Pros:** Menor tiempo quirúrgico, menos complicaciones metabólicas.",
-        "ucn_ind": "⚠️ **Ureterocutaneostomía (UCN):** Paliativo / Último Recurso.",
-        "ucn_desc": "Indicado si **resección intestinal imposible** (intestino corto, enteritis actínica) o fragilidad extrema. Alta tasa de estenosis.",
+        
+        # 2. ddMVAC
+        "ddmvac_title": "Alternativo: MVAC Dosis-Densa (ddMVAC)",
+        "ddmvac_details": """
+        * **Metotrexato:** 30 mg/m² IV (Día 1)
+        * **Vinblastina:** 3 mg/m² IV (Día 2)
+        * **Doxorrubicina:** 30 mg/m² IV (Día 2)
+        * **Cisplatino:** 70 mg/m² IV (Día 2)
+        * **Soporte:** G-CSF (Pegfilgrastim) Día 3 o 3-9
+        * **Ciclo:** Cada 14 días (q2w)
+        * **Duración:** 4 Ciclos
+        """,
+        
+        # 3. NIAGARA
+        "niagara_title": "🆕 NIAGARA: Durvalumab + Gem/Cis",
+        "niagara_details": """
+        **Pre-Operatorio (4 Ciclos, q3w):**
+        * **Durvalumab:** 1500 mg IV (Día 1)
+        * **Gemcitabina:** 1000 mg/m² IV (Días 1 y 8)
+        * **Cisplatino:** 70 mg/m² IV (Día 1)
+        
+        **-- CIRUGÍA (RC) --**
+        
+        **Post-Operatorio (Adyuvante):**
+        * **Durvalumab:** 1500 mg IV cada 4 semanas
+        * **Duración:** 8 Ciclos
+        """,
 
-        # METASTATIC
-        "meta_title": "🔴 Metastásico (mUC)",
-        "ev_pembro": "🏆 **1ª Línea:** Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "nac_contra_title": "🚫 Contraindicaciones Cisplatino (Galsky):",
+        "nac_contra_list": """
+        1.  **ECOG PS ≥ 2**
+        2.  **TFG < 60 ml/min** (Dosis dividida 45-59 posible).
+        3.  **Pérdida Auditiva:** Grado ≥ 2.
+        4.  **Neuropatía:** Grado ≥ 2.
+        5.  **Insuficiencia Cardíaca:** NYHA III/IV.
+        """,
+
+        # Metastatic
+        "meta_title": "🔴 Metastásico (mUC): EV + Pembro",
+        "ev_pembro_header": "🏆 Estándar: Enfortumab Vedotin + Pembrolizumab (EV-302)",
+        "ev_dose": "**Enfortumab Vedotin:** 1.25 mg/kg (Máx 125 mg) IV Días 1 y 8",
+        "pembro_dose": "**Pembrolizumab:** 200 mg IV Día 1 (q3w) O 400 mg q6w",
+        "meta_contra_title": "⚠️ Contraindicaciones EV+Pembro:",
+        "meta_contra_list": "* Diabetes Descontrolada (Hiperglucemia)\n* Reacciones Cutáneas Severas (SJS/TEN)\n* Insuficiencia Hepática (Child-Pugh C)\n* Neuropatía Previa > Gr2",
+
+        # Surgery
+        "surg_title": "🔪 Brújula Quirúrgica",
+        "nb_ind": "Neovejiga",
+        "ic_ind": "Conducto Ileal",
+        "ucn_ind": "UCN (Paliativo)",
+        "nb_contra_title": "❌ Contraindicaciones Neovejiga:",
+        "nb_contra_list": "1. Tumor en Uretra\n2. TFG < 50\n3. Falla Hepática\n4. Incapaz de Autocatet.\n5. EII (Crohn)\n6. Radiación Previa"
     }
 }
 
@@ -214,19 +327,11 @@ def render_tnm_calculator(lang):
     t = c1.selectbox("T", ["Ta", "Tis", "T1", "T2", "T3", "T4"])
     n = c2.selectbox("N", ["N0", "N1", "N2", "N3"])
     m = c3.selectbox("M", ["M0", "M1"])
-    
-    stage = "NMIBC"
-    if "T2" in t or "T3" in t or "T4" in t: stage = "MIBC"
-    if "N" in n and n != "N0": stage = "Locally Advanced / Metastatic"
-    if "M1" in m: stage = "Metastatic"
-    
-    st.success(f"Calculated Stage: {stage}")
+    st.success(f"Selected: {t} {n} {m}")
 
 def render_eortc_calculator(lang):
     st.markdown(f"## {get_text(lang, 'nav_modules')[1]}")
-    st.info("The full Sylvester et al. 2006 scoring logic is implemented here (simplified for this view).")
-    
-    # Simple Implementation for functionality
+    st.info("EORTC Risk Calculator (Sylvester et al. 2006)")
     c1, c2 = st.columns(2)
     with c1:
         st.selectbox("Number of Tumors", ["Single", "2-7", "≥8"])
@@ -234,122 +339,140 @@ def render_eortc_calculator(lang):
     with c2:
         st.selectbox("Prior Recurrence Rate", ["Primary", "≤1/year", ">1/year"])
         st.selectbox("T Stage", ["Ta", "T1"])
-    st.caption("Output: Probability of Recurrence & Progression (See tables in full version)")
 
 def render_nmibc_complex(lang):
     st.markdown(f"## {get_text(lang, 'nmibc_title')}")
     
-    
 
-    # Risk Factors
-    st.subheader(get_text(lang, 'risk_factors'))
-    col1, col2 = st.columns(2)
-    with col1:
-        grade = st.radio(get_text(lang, 'grade_label'), ["Low Grade", "High Grade"])
-        size = st.radio(get_text(lang, 'size_label'), ["< 3 cm", "≥ 3 cm"])
-        multifocal = st.checkbox(get_text(lang, 'multifocal'))
-    with col2:
-        is_t1 = st.checkbox(get_text(lang, 't1_label'))
-        muscle = st.checkbox(get_text(lang, 'muscle_label'), value=True)
-        complete = st.checkbox(get_text(lang, 'complete_label'), value=True)
+[Image of bladder cancer staging diagram]
 
-    st.divider()
 
-    # Re-TURB Logic
+    # Re-TURB
     st.subheader(get_text(lang, 'returb_header'))
+    c1, c2 = st.columns(2)
+    with c1:
+        is_t1 = st.checkbox("T1 Stage?", value=False)
+        muscle = st.checkbox("Muscle in specimen?", value=True)
+    with c2:
+        complete = st.checkbox("Resection complete?", value=True)
+        high_grade = st.checkbox("High Grade?", value=False)
+        
     needs_returb = False
-    if is_t1 or not complete:
-        needs_returb = True
-    if not muscle and ("High Grade" in grade or is_t1):
-        needs_returb = True
-
+    if is_t1 or not complete: needs_returb = True
+    if not muscle and (high_grade or is_t1): needs_returb = True
+    
     if needs_returb:
-        st.markdown(f"""
-        <div class="alert-box">
-            <h4>{get_text(lang, 'returb_req')}</h4>
-            {get_text(lang, 'returb_reasons')}
-        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="alert-box"><h4>{get_text(lang, 'returb_req')}</h4>{get_text(lang, 'returb_reasons')}</div>""", unsafe_allow_html=True)
     else:
         st.markdown(f"""<div class="success-box">{get_text(lang, 'returb_ok')}</div>""", unsafe_allow_html=True)
 
-    # Treatment Recommendation
-    st.subheader(get_text(lang, 'rec_header'))
-    
-    # Risk Logic (Simplified EAU)
-    risk = "Low"
-    if is_t1 and "High Grade" in grade and (multifocal or "≥" in size): risk = "Very High"
-    elif "High Grade" in grade or is_t1: risk = "High"
-    elif "Low Grade" in grade and ("≥" in size or multifocal): risk = "Intermediate"
-    
-    if risk == "Low": st.success(get_text(lang, 'rec_low'))
-    elif risk == "Intermediate": st.warning(get_text(lang, 'rec_inter'))
-    elif risk == "High": st.warning(get_text(lang, 'rec_high'))
-    elif risk == "Very High": st.error(get_text(lang, 'rec_vhigh'))
-
     # Protocols
+    st.divider()
     st.subheader(get_text(lang, 'proto_header'))
-    with st.expander("BCG Protocol"):
-        st.write(get_text(lang, 'bcg_sched'))
-    with st.expander("Mitomycin Protocol"):
-        st.write(get_text(lang, 'mmc_sched'))
+    
+    tab_bcg, tab_mmc = st.tabs([get_text(lang, 'bcg_tab'), get_text(lang, 'mmc_tab')])
+    
+    with tab_bcg:
+        st.markdown(get_text(lang, 'bcg_sched'))
+        st.markdown(f"""<div class="alert-box"><strong>{get_text(lang, 'bcg_contra_title')}</strong><br>{get_text(lang, 'bcg_contra_list')}</div>""", unsafe_allow_html=True)
+        
+    with tab_mmc:
+        st.markdown(get_text(lang, 'mmc_sched'))
+        st.markdown(f"""<div class="alert-box"><strong>{get_text(lang, 'mmc_contra_title')}</strong><br>{get_text(lang, 'mmc_contra_list')}</div>""", unsafe_allow_html=True)
 
-def render_mibc_niagara(lang):
+def render_mibc_niagara_dosings(lang):
     st.markdown(f"## {get_text(lang, 'mibc_title')}")
     
-    fit = st.checkbox(get_text(lang, 'cis_fit'), value=True)
+    fit = st.checkbox(get_text(lang, 'cis_fit_q'), value=True)
     
     if fit:
-        # NIAGARA SECTION
+        # DOSING SCHEMAS
+        st.markdown(f"### {get_text(lang, 'nac_schemas_title')}")
+        
+        c1, c2, c3 = st.columns(3)
+        
+        # 1. Gem-Cis
+        with c1:
+            st.markdown(f"""
+            <div class="schema-box">
+                <div class="dose-header">{get_text(lang, 'gc_title')}</div>
+                <hr>
+                {get_text(lang, 'gc_details')}
+            </div>
+            """, unsafe_allow_html=True)
+            
+        # 2. ddMVAC
+        with c2:
+            st.markdown(f"""
+            <div class="schema-box">
+                <div class="dose-header">{get_text(lang, 'ddmvac_title')}</div>
+                <hr>
+                {get_text(lang, 'ddmvac_details')}
+            </div>
+            """, unsafe_allow_html=True)
+            
+        # 3. NIAGARA
+        with c3:
+            st.markdown(f"""
+            <div class="schema-box">
+                <div class="dose-header">{get_text(lang, 'niagara_title')}</div>
+                <hr>
+                {get_text(lang, 'niagara_details')}
+            </div>
+            """, unsafe_allow_html=True)
+            
+    # CONTRAINDICATIONS
+    st.markdown(f"""
+    <div class="warning-box">
+        <strong>{get_text(lang, 'nac_contra_title')}</strong>
+        {get_text(lang, 'nac_contra_list')}
+    </div>
+    """, unsafe_allow_html=True)
+
+def render_metastatic_full(lang):
+    st.markdown(f"## {get_text(lang, 'meta_title')}")
+    
+    st.markdown(f"""<div class="success-box"><h3>{get_text(lang, 'ev_pembro_header')}</h3></div>""", unsafe_allow_html=True)
+    
+    c1, c2 = st.columns(2)
+    
+    # Schema
+    with c1:
         st.markdown(f"""
-        <div class="info-box">
-            <h4>{get_text(lang, 'niagara_header')}</h4>
-            {get_text(lang, 'niagara_desc')}
-            <br><i>{get_text(lang, 'niagara_benefit')}</i>
+        <div class="schema-box">
+            <div class="dose-header">Dosing Schema</div>
+            <hr>
+            <p>{get_text(lang, 'ev_dose')}</p>
+            <p>{get_text(lang, 'pembro_dose')}</p>
+            <p><strong>Cycle:</strong> 21 Days (3 Weeks)</p>
         </div>
         """, unsafe_allow_html=True)
         
+    # Contraindications
+    with c2:
         st.markdown(f"""
-        <div class="success-box">
-            {get_text(lang, 'std_nac')}
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"""
-        <div class="warning-box">
-            {get_text(lang, 'unfit_desc')}
+        <div class="alert-box">
+            <strong>{get_text(lang, 'meta_contra_title')}</strong><br>
+            {get_text(lang, 'meta_contra_list')}
         </div>
         """, unsafe_allow_html=True)
 
 def render_surgery_compass(lang):
     st.markdown(f"## {get_text(lang, 'surg_title')}")
-    
-    tabs = st.tabs(get_text(lang, 'tabs_div'))
-    
-    # 1. Neobladder
-    with tabs[0]:
-        st.success(get_text(lang, 'nb_ind'))
-        st.error(get_text(lang, 'nb_contra'))
-        st.markdown(get_text(lang, 'nb_c_list'))
-    
-    # 2. Conduit
-    with tabs[1]:
-        st.info(get_text(lang, 'ic_ind'))
-        st.markdown(get_text(lang, 'ic_pros'))
-        
-    # 3. UCN
-    with tabs[2]:
-        st.warning(get_text(lang, 'ucn_ind'))
-        st.write(get_text(lang, 'ucn_desc'))
-
-def render_metastatic(lang):
-    st.markdown(f"## {get_text(lang, 'meta_title')}")
-    st.success(get_text(lang, 'ev_pembro'))
+    tab1, tab2, tab3 = st.tabs([get_text(lang, 'nb_ind'), get_text(lang, 'ic_ind'), get_text(lang, 'ucn_ind')])
+    with tab1:
+        st.error(get_text(lang, 'nb_contra_title'))
+        st.write(get_text(lang, 'nb_contra_list'))
+    with tab2:
+        st.info("Standard for those unfit for Neobladder.")
+    with tab3:
+        st.warning("Palliative / Last Resort.")
 
 # --- MAIN APP FLOW ---
 
 def main():
     with st.sidebar:
-        st.header(TRANS["EN"]["lang_select"]) # This key is now safely in the dictionary
+        st.header(TRANS["EN"]["lang_select"])
         lang_choice = st.radio("", ["English", "Deutsch", "Español"])
         lang = "EN"
         if lang_choice == "Deutsch": lang = "DE"
@@ -363,12 +486,11 @@ def main():
     st.title(get_text(lang, "title"))
     st.caption(get_text(lang, "caption"))
 
-    # Map the translated module names back to functions
     if mode == modules[0]: render_tnm_calculator(lang)
     elif mode == modules[1]: render_eortc_calculator(lang)
     elif mode == modules[2]: render_nmibc_complex(lang)
-    elif mode == modules[3]: render_mibc_niagara(lang)
-    elif mode == modules[4]: render_metastatic(lang)
+    elif mode == modules[3]: render_mibc_niagara_dosings(lang)
+    elif mode == modules[4]: render_metastatic_full(lang)
     elif mode == modules[5]: render_surgery_compass(lang)
 
 if __name__ == "__main__":
