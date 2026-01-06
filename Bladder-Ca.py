@@ -26,18 +26,26 @@ st.markdown("""
 TRANS = {
     "EN": {
         "title": "Bladder Cancer Clinical Decision Support",
-        "caption": "EAU 2025 & German S3 (V3.0) | NIAGARA, EV-302, Full Protocols",
+        "caption": "EAU 2025 & German S3 (V3.0) | NIAGARA, EV-302, Full Surgical Compass",
         "lang_select": "Select Language / Sprache / Idioma",
         "nav_title": "Navigation",
         "nav_modules": [
-            "Diagnosis (TNM)", 
+            "Diagnosis (TNM & Staging)", 
             "EORTC Calculator (Full)", 
             "NMIBC: Risk, Re-TURB & Protocols", 
             "MIBC: Neoadjuvant (NIAGARA Only)", 
             "Metastatic (EV+Pembro)", 
-            "Surgical Compass (Diversions)"
+            "Surgical Compass (Diversions & PLND)"
         ],
         
+        # TNM
+        "tnm_title": "🧮 TNM Staging & Clinical Routing",
+        "stage_result": "Calculated AJCC Stage Group:",
+        "clinical_rec": "Clinical Pathway Recommendation:",
+        "rec_nmibc": "👉 Proceed to **NMIBC Module** (TURBT + Adjuvant Instillations).",
+        "rec_mibc": "👉 Proceed to **MIBC Module** (Neoadjuvant + Radical Cystectomy).",
+        "rec_meta": "👉 Proceed to **Metastatic Module** (Systemic Therapy).",
+
         # EORTC
         "eortc_title": "🔢 EORTC Risk Calculator (Sylvester et al. 2006)",
         "nb_tumors": "Number of Tumors",
@@ -51,22 +59,20 @@ TRANS = {
         
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Complex Stratification & Treatment",
-        "nmibc_risk_header": "1. Risk Stratification",
+        "nmibc_risk_header": "1. Risk Stratification (EAU 2024)",
         "returb_header": "2. Re-TURB (Nach-TUR-B) Decision",
         "returb_req": "Re-TURB REQUIRED",
         "returb_reasons": "Indications: T1 Stage, Incomplete Resection, or No Muscle in High Risk specimen.",
         "returb_ok": "Re-TURB likely not needed",
         "proto_header": "3. Protocols & Contraindications",
-        
-        # Risk Groups
-        "rg_low": "LOW RISK",
-        "rg_inter": "INTERMEDIATE RISK",
-        "rg_high": "HIGH RISK",
         "rg_vhigh": "VERY HIGH RISK",
-        "rec_low": "Single Instillation (SI) within 24h. No adjuvant treatment.",
-        "rec_inter": "Adjuvant: 1 Year Chemotherapy (MMC) OR BCG (Induction + 1y Maint).",
-        "rec_high": "Adjuvant: BCG Full Dose (1-3 Years). Re-TURB Mandatory.",
+        "rg_high": "HIGH RISK", 
+        "rg_inter": "INTERMEDIATE RISK",
+        "rg_low": "LOW RISK",
         "rec_vhigh": "Discuss Early Radical Cystectomy. BCG only if unfit/refused.",
+        "rec_high": "Adjuvant: BCG Full Dose (1-3 Years). Re-TURB Mandatory.",
+        "rec_inter": "Adjuvant: 1 Year Chemotherapy (MMC) OR BCG (Induction + 1y Maint).",
+        "rec_low": "Single Instillation (SI) within 24h. No adjuvant treatment.",
 
         "bcg_tab": "BCG Immunotherapy",
         "mmc_tab": "Mitomycin C",
@@ -130,34 +136,58 @@ TRANS = {
         """,
 
         # Surgery
-        "surg_title": "🔪 Surgical Compass: Urinary Diversion",
-        "nb_ind": "Orthotopic Neobladder",
-        "ic_ind": "Ileal Conduit",
-        "ucn_ind": "UCN (Ureterocutaneostomy)",
-        "nb_contra_title": "❌ Absolute Contraindications for Neobladder:",
+        "surg_title": "🔪 Surgical Compass: Urinary Diversion & PLND",
+        "plnd_tab": "Lymph Node Dissection",
+        "nb_tab": "Orthotopic Neobladder",
+        "ic_tab": "Ileal Conduit",
+        "ucn_tab": "Ureterocutaneostomy",
+        
+        "nb_ind_title": "✅ Indications (Neobladder):",
+        "nb_ind_list": "Motivated patient, good manual dexterity, negative urethral margins, GFR > 50.",
+        "nb_contra_title": "❌ Absolute Contraindications:",
         "nb_contra_list": """
-        1. Tumor infiltration of **Urethra** or **Bladder Neck**.
-        2. Renal Insufficiency (**GFR < 50 ml/min**).
-        3. **Severe Hepatic Dysfunction**.
-        4. Inability to perform **self-catheterization** (mental/physical/dexterity).
-        5. **Inflammatory Bowel Disease** (Crohn's/Colitis).
-        6. Prior **high-dose pelvic radiation** (risk of anastomotic leak/failure).
-        """
+        1. **Oncological:** Tumor infiltration of Urethra or Bladder Neck.
+        2. **Renal:** GFR < 50 ml/min.
+        3. **Hepatic:** Severe Hepatic Dysfunction.
+        4. **Functional:** Inability to perform self-catheterization (mental/physical/dexterity).
+        5. **Intestinal:** Inflammatory Bowel Disease (Crohn's/Colitis).
+        6. **History:** Prior high-dose pelvic radiation.
+        """,
+        
+        "ic_ind_title": "✅ Indications (Conduit):",
+        "ic_ind_list": "Standard for patients unfit for Neobladder, elderly, prior radiation (relative).",
+        "ic_pros": "**Pros:** Shorter surgery, no risk of hypercontinence/retention, fewer metabolic issues than NB.",
+        
+        "ucn_ind_title": "⚠️ Indications (UCN):",
+        "ucn_ind_list": "**Palliative / Salvage:** Frozen pelvis, short bowel syndrome, severe radiation enteritis, extreme frailty.",
+        "ucn_cons": "**Cons:** High risk of stomal stenosis, lifelong ureteral stenting usually required.",
+        
+        "plnd_title": "Pelvic Lymph Node Dissection (PLND)",
+        "plnd_std": "**Standard PLND:** External iliac, Internal iliac, Obturator fossa nodes.",
+        "plnd_ext": "**Extended PLND (Recommended by EAU/S3):** All above + Common iliac + Presacral nodes (up to aortic bifurcation).",
     },
     
     "DE": {
         "title": "Klinische Entscheidungshilfe: Harnblasenkarzinom",
-        "caption": "EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Protokolle",
+        "caption": "EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Chirurgie-Kompass",
         "lang_select": "Sprache wählen",
         "nav_title": "Navigation",
         "nav_modules": [
-            "Diagnose (TNM)", 
+            "Diagnose (TNM & Staging)", 
             "EORTC Rechner (Voll)", 
             "NMIBC: Risiko & Therapie", 
             "MIBC: Neoadjuvant (NIAGARA)", 
             "Metastasiert (EV+Pembro)", 
             "Chirurgie Kompass (Ableitung)"
         ],
+
+        # TNM
+        "tnm_title": "🧮 TNM Staging & Klinischer Pfad",
+        "stage_result": "Berechnetes Stadium (AJCC):",
+        "clinical_rec": "Empfohlener Klinischer Pfad:",
+        "rec_nmibc": "👉 Weiter zum **NMIBC Modul** (TUR-B + Instillationen).",
+        "rec_mibc": "👉 Weiter zum **MIBC Modul** (Neoadjuvant + Zystektomie).",
+        "rec_meta": "👉 Weiter zum **Metastasierten Modul** (Systemtherapie).",
         
         # EORTC
         "eortc_title": "🔢 EORTC Risikokalkulator (Sylvester et al. 2006)",
@@ -172,21 +202,20 @@ TRANS = {
         
         # NMIBC
         "nmibc_title": "🟢 NMIBC: Komplexe Stratifizierung & Therapie",
-        "nmibc_risk_header": "1. Risikostratifizierung",
+        "nmibc_risk_header": "1. Risikostratifizierung (EAU 2024)",
         "returb_header": "2. Nach-TUR-B (Re-TURB) Entscheidung",
         "returb_req": "Nach-TUR-B ERFORDERLICH",
         "returb_reasons": "Indikation: T1-Stadium, Inkomplett, oder kein Muskel bei High Risk.",
         "returb_ok": "Nach-TUR-B wahrscheinlich nicht nötig",
         "proto_header": "3. Protokolle & Kontraindikationen",
-        
-        "rg_low": "NIEDRIGES RISIKO (Low Risk)",
-        "rg_inter": "MITTLERES RISIKO (Intermediate Risk)",
-        "rg_high": "HOHES RISIKO (High Risk)",
         "rg_vhigh": "SEHR HOHES RISIKO (Very High Risk)",
-        "rec_low": "Einmalige Frühinstillation (SI) <24h. Keine weitere Therapie.",
-        "rec_inter": "Adjuvant: 1 Jahr Chemotherapie (MMC) ODER BCG (Induktion + 1 Jahr Erhaltung).",
-        "rec_high": "Adjuvant: BCG Volldosis (1-3 Jahre). Nach-TUR-B obligatorisch.",
+        "rg_high": "HOHES RISIKO (High Risk)",
+        "rg_inter": "MITTLERES RISIKO (Intermediate Risk)",
+        "rg_low": "NIEDRIGES RISIKO (Low Risk)",
         "rec_vhigh": "Frühe Zystektomie diskutieren. BCG nur wenn OP unmöglich/abgelehnt.",
+        "rec_high": "Adjuvant: BCG Volldosis (1-3 Jahre). Nach-TUR-B obligatorisch.",
+        "rec_inter": "Adjuvant: 1 Jahr Chemotherapie (MMC) ODER BCG (Induktion + 1 Jahr Erhaltung).",
+        "rec_low": "Einmalige Frühinstillation (SI) <24h. Keine weitere Therapie.",
 
         "bcg_tab": "BCG Immuntherapie",
         "mmc_tab": "Mitomycin C",
@@ -250,24 +279,40 @@ TRANS = {
         """,
 
         # Surgery
-        "surg_title": "🔪 Chirurgie Kompass",
-        "nb_ind": "Neoblase",
-        "ic_ind": "Conduit",
-        "ucn_ind": "Harnleiterhautfistel (UCN)",
-        "nb_contra_title": "❌ Absolute Neoblasen-Kontraindikationen:",
+        "surg_title": "🔪 Chirurgie Kompass: Ableitung & LAE",
+        "plnd_tab": "Lymphadenektomie (LAE)",
+        "nb_tab": "Orthotope Neoblase",
+        "ic_tab": "Ileum-Conduit",
+        "ucn_tab": "Harnleiterhautfistel (UCN)",
+        
+        "nb_ind_title": "✅ Indikationen (Neoblase):",
+        "nb_ind_list": "Motivierter Patient, gute Dexterität, negativer Absetzungsrand Urethra, GFR > 50.",
+        "nb_contra_title": "❌ Absolute Kontraindikationen:",
         "nb_contra_list": """
-        1. Tumor in **Harnröhre** / **Blasenhals**.
-        2. Niereninsuffizienz (**GFR < 50 ml/min**).
-        3. **Schwere Leberfunktionsstörung**.
-        4. Unfähigkeit zum **Selbstkatheterismus** (mental/physisch).
-        5. **Chronisch entzündliche Darmerkrankungen** (Crohn).
-        6. **Hochdosis-Bestrahlung** Becken.
-        """
+        1. **Onkologisch:** Tumor in **Harnröhre** / **Blasenhals**.
+        2. **Renal:** Niereninsuffizienz (**GFR < 50 ml/min**).
+        3. **Hepatisch:** Schwere Leberfunktionsstörung.
+        4. **Funktionell:** Unfähigkeit zum **Selbstkatheterismus** (mental/physisch).
+        5. **Intestinal:** **Chronisch entzündliche Darmerkrankungen** (Crohn).
+        6. **Historie:** **Hochdosis-Bestrahlung** Becken.
+        """,
+        
+        "ic_ind_title": "✅ Indikationen (Conduit):",
+        "ic_ind_list": "Standard für Patienten ungeeignet für Neoblase, Ältere, Vorbestrahlung.",
+        "ic_pros": "**Vorteile:** Kürzere OP, keine Hyperkontinenz/Harnverhalt, weniger metabolische Azidose als NB.",
+        
+        "ucn_ind_title": "⚠️ Indikationen (UCN):",
+        "ucn_ind_list": "**Palliativ / Salvage:** Frozen Pelvis, Kurzdarmsyndrom, Strahlenenteritis, extreme Gebrechlichkeit.",
+        "ucn_cons": "**Nachteile:** Hohes Stenoserisiko, meist lebenslange Schienung (MJ) nötig.",
+        
+        "plnd_title": "Pelvine Lymphadenektomie (LAE)",
+        "plnd_std": "**Standard LAE:** A. iliaca externa, interna, Fossa obturatoria.",
+        "plnd_ext": "**Erweiterte LAE (Empfohlen S3/EAU):** Wie oben + A. iliaca communis + präsakral (bis Aortenbifurkation).",
     },
 
     "ES": {
         "title": "Soporte de Decisión Clínica: Cáncer de Vejiga",
-        "caption": "Guías EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Protocolos",
+        "caption": "Guías EAU 2025 & S3 (V3.0) | NIAGARA, EV-302, Brújula Quirúrgica",
         "lang_select": "Seleccionar Idioma",
         "nav_title": "Navegación",
         "nav_modules": [
@@ -276,8 +321,16 @@ TRANS = {
             "NMIBC: Riesgo & Tratamiento", 
             "MIBC: Neoadyuvancia (NIAGARA)", 
             "Metastásico (EV+Pembro)", 
-            "Brújula Quirúrgica"
+            "Brújula Quirúrgica (Derivaciones)"
         ],
+        
+        # TNM
+        "tnm_title": "🧮 TNM Estadiaje y Ruta Clínica",
+        "stage_result": "Estadio AJCC Calculado:",
+        "clinical_rec": "Recomendación de Vía Clínica:",
+        "rec_nmibc": "👉 Proceder al **Módulo NMIBC** (RTU + Instilaciones).",
+        "rec_mibc": "👉 Proceder al **Módulo MIBC** (Neoadyuvancia + Cistectomía).",
+        "rec_meta": "👉 Proceder al **Módulo Metastásico** (Terapia Sistémica).",
         
         # EORTC
         "eortc_title": "🔢 Calculadora EORTC (Sylvester et al. 2006)",
@@ -298,15 +351,14 @@ TRANS = {
         "returb_reasons": "Indicación: Estadio T1, Incompleta, o sin músculo en Alto Riesgo.",
         "returb_ok": "No requiere Re-RTU",
         "proto_header": "3. Protocolos y Contraindicaciones",
-        
-        "rg_low": "BAJO RIESGO",
-        "rg_inter": "RIESGO INTERMEDIO",
-        "rg_high": "ALTO RIESGO",
         "rg_vhigh": "MUY ALTO RIESGO",
-        "rec_low": "Instilación Única (SI) <24h. Sin tratamiento adicional.",
-        "rec_inter": "Adyuvancia: 1 Año Quimioterapia (MMC) O BCG (Inducción + 1a Mantenimiento).",
-        "rec_high": "Adyuvancia: BCG Dosis Completa (1-3 Años). Re-RTU Obligatoria.",
+        "rg_high": "ALTO RIESGO",
+        "rg_inter": "RIESGO INTERMEDIO",
+        "rg_low": "BAJO RIESGO",
         "rec_vhigh": "Discutir Cistectomía Temprana. BCG solo si no apto.",
+        "rec_high": "Adyuvancia: BCG Dosis Completa (1-3 Años). Re-RTU Obligatoria.",
+        "rec_inter": "Adyuvancia: 1 Año Quimioterapia (MMC) O BCG (Inducción + 1a Mantenimiento).",
+        "rec_low": "Instilación Única (SI) <24h. Sin tratamiento adicional.",
 
         "bcg_tab": "Inmunoterapia BCG",
         "mmc_tab": "Mitomicina C",
@@ -369,18 +421,33 @@ TRANS = {
 
         # Surgery
         "surg_title": "🔪 Brújula Quirúrgica",
-        "nb_ind": "Neovejiga",
-        "ic_ind": "Conducto Ileal",
-        "ucn_ind": "UCN (Paliativo)",
-        "nb_contra_title": "❌ Contraindicaciones Neovejiga:",
+        "plnd_tab": "Linfadenectomía (PLND)",
+        "nb_tab": "Neovejiga",
+        "ic_tab": "Conducto Ileal",
+        "ucn_tab": "UCN (Paliativo)",
+        
+        "nb_ind_title": "✅ Indicaciones (Neovejiga):",
+        "nb_ind_list": "Paciente motivado, buena destreza, márgenes negativos, TFG > 50.",
+        "nb_contra_title": "❌ Contraindicaciones Absolutas:",
         "nb_contra_list": """
-        1. Tumor en **Uretra** / **Cuello**.
-        2. **TFG < 50 ml/min**.
-        3. **Falla Hepática**.
-        4. Incapaz de **Autocateterismo**.
-        5. **EII** (Crohn).
-        6. **Radiación Previa**.
-        """
+        1. **Oncológico:** Tumor en **Uretra** / **Cuello**.
+        2. **Renal:** **TFG < 50 ml/min**.
+        3. **Hepático:** Falla Hepática Severa.
+        4. **Funcional:** Incapaz de **Autocateterismo**.
+        5. **Intestinal:** **EII** (Crohn).
+        6. **Historial:** **Radiación Previa**.
+        """,
+        "ic_ind_title": "✅ Indicaciones (Conducto):",
+        "ic_ind_list": "Estándar para no aptos a Neovejiga, ancianos, radiación previa.",
+        "ic_pros": "**Pros:** Cirugía más corta, sin riesgo de hipercontinencia, menos acidosis que NB.",
+        
+        "ucn_ind_title": "⚠️ Indicaciones (UCN):",
+        "ucn_ind_list": "**Paliativo / Salvamento:** Pelvis congelada, intestino corto, enteritis actínica, fragilidad.",
+        "ucn_cons": "**Contras:** Alto riesgo de estenosis, requiere stent de por vida.",
+        
+        "plnd_title": "Linfadenectomía Pélvica (PLND)",
+        "plnd_std": "**PLND Estándar:** Ilíaca externa, interna, fosa obturatriz.",
+        "plnd_ext": "**PLND Extendida (Recomendada):** Arriba + Ilíaca común + presacra (hasta bifurcación aórtica).",
     }
 }
 
@@ -390,12 +457,50 @@ def get_text(lang, key):
 # --- MODULES ---
 
 def render_tnm_calculator(lang):
-    st.markdown("### TNM Calculator (8th Ed)")
-    c1, c2, c3 = st.columns(3)
-    t = c1.selectbox("T", ["Ta", "Tis", "T1", "T2", "T3", "T4"])
-    n = c2.selectbox("N", ["N0", "N1", "N2", "N3"])
-    m = c3.selectbox("M", ["M0", "M1"])
-    st.success(f"Selected: {t} {n} {m}")
+    st.markdown(f"## {get_text(lang, 'tnm_title')}")
+    st.info("AJCC 8th Edition / UICC")
+    
+    col1, col2, col3 = st.columns(3)
+    t = col1.selectbox("T", ["Ta", "Tis", "T1", "T2a", "T2b", "T3a", "T3b", "T4a", "T4b"])
+    n = col2.selectbox("N", ["N0", "N1", "N2", "N3"])
+    m = col3.selectbox("M", ["M0", "M1a", "M1b"])
+    
+    # Logic
+    stage_group = "Unknown"
+    recommendation = ""
+    
+    if "M1" in m:
+        stage_group = "Stage IV (Metastatic)"
+        recommendation = "rec_meta"
+    elif "T4b" in t:
+        stage_group = "Stage IVB"
+        recommendation = "rec_meta"
+    elif n != "N0":
+        stage_group = "Stage IIIA/IIIB (Locally Advanced)"
+        recommendation = "rec_mibc" # Usually treated as MIBC/Systemic
+    elif "T4a" in t:
+        stage_group = "Stage IIIB"
+        recommendation = "rec_mibc"
+    elif "T3" in t:
+        stage_group = "Stage IIIA"
+        recommendation = "rec_mibc"
+    elif "T2" in t:
+        stage_group = "Stage II (Muscle Invasive)"
+        recommendation = "rec_mibc"
+    elif "T1" in t:
+        stage_group = "Stage I (High Risk NMIBC)"
+        recommendation = "rec_nmibc"
+    elif "Tis" in t:
+        stage_group = "Stage 0is (CIS)"
+        recommendation = "rec_nmibc"
+    else:
+        stage_group = "Stage 0a (Ta)"
+        recommendation = "rec_nmibc"
+        
+    st.divider()
+    st.markdown(f"### {get_text(lang, 'stage_result')} <span style='color:#d63031'>{stage_group}</span>", unsafe_allow_html=True)
+    st.markdown(f"#### {get_text(lang, 'clinical_rec')}")
+    st.success(get_text(lang, recommendation))
 
 def render_eortc_calculator_full(lang):
     st.markdown(f"## {get_text(lang, 'eortc_title')}")
@@ -433,7 +538,6 @@ def render_eortc_calculator_full(lang):
 
 def render_nmibc_full_restore(lang):
     st.markdown(f"## {get_text(lang, 'nmibc_title')}")
-    st.caption("EAU 2024/25 Risk Stratification")
     
     # 1. RISK STRATIFICATION
     st.markdown(f"### {get_text(lang, 'nmibc_risk_header')}")
@@ -556,14 +660,33 @@ def render_metastatic_full(lang):
 def render_surgery_compass(lang):
     st.markdown(f"## {get_text(lang, 'surg_title')}")
     
-    tab1, tab2, tab3 = st.tabs([get_text(lang, 'nb_ind'), get_text(lang, 'ic_ind'), get_text(lang, 'ucn_ind')])
-    with tab1:
-        st.error(get_text(lang, 'nb_contra_title'))
-        st.markdown(get_text(lang, 'nb_contra_list'))
-    with tab2:
-        st.info("Standard for those unfit for Neobladder.")
-    with tab3:
-        st.warning("Palliative / Last Resort.")
+    # 1. PLND
+    with st.expander(get_text(lang, 'plnd_tab'), expanded=True):
+        st.info(f"**{get_text(lang, 'plnd_title')}**")
+        st.write(get_text(lang, 'plnd_std'))
+        st.markdown(f"<div class='success-box'>{get_text(lang, 'plnd_ext')}</div>", unsafe_allow_html=True)
+
+    # 2. Diversions
+    tab1, tab2, tab3 = st.tabs([get_text(lang, 'nb_tab'), get_text(lang, 'ic_tab'), get_text(lang, 'ucn_tab')])
+    
+    with tab1: # Neobladder
+        c1, c2 = st.columns(2)
+        with c1:
+            st.success(get_text(lang, 'nb_ind_title'))
+            st.write(get_text(lang, 'nb_ind_list'))
+        with c2:
+            st.error(get_text(lang, 'nb_contra_title'))
+            st.markdown(get_text(lang, 'nb_contra_list'))
+            
+    with tab2: # Conduit
+        st.success(get_text(lang, 'ic_ind_title'))
+        st.write(get_text(lang, 'ic_ind_list'))
+        st.info(get_text(lang, 'ic_pros'))
+        
+    with tab3: # UCN
+        st.warning(get_text(lang, 'ucn_ind_title'))
+        st.write(get_text(lang, 'ucn_ind_list'))
+        st.error(get_text(lang, 'ucn_cons'))
 
 # --- MAIN APP FLOW ---
 
